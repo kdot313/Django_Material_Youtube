@@ -1,0 +1,138 @@
+## install virtualenv
+
+1) pip install virtualenv
+
+## Create virtualenv
+
+1) virtualenv env
+
+## Activate virtualenv
+
+1) cd env
+2) cd Scripts
+3) ./activate
+4) cd ..
+5) cd ..
+
+## Create a Project
+
+1) django-admin startproject PROJECT_NAME
+2) cd PROJECT_NAME
+
+## Made a app
+
+1) python .\manage.py startapp APP_NAME
+
+Eg.--> python .\manage.py startapp accounts
+Eg.--> python .\manage.py startapp home
+
+## Start django server
+
+1) python .\manage.py runserver
+
+2) python .\manage.py runserver 0.0.0.0:5000           // For Running at different servers
+
+## Add the apps in settings.py like this
+
+""" EXTERNAL_APPS = [
+    'accounts',
+    'home'
+]
+
+INSTALLED_APPS+=EXTERNAL_APPS """
+
+## Next topic is views and urls
+
+### Go to views.py, add this eg.
+
+from django.shortcuts import render
+
+from django.http import HttpResponse
+
+def home(request):
+    return HttpResponse("""<h1>Hey I am a Django Server</h1>
+                        <p>Hey this is coming from Django Server</p>
+                        <hr>
+                        <h3 style="color:red">Hope you are loving it :) </h3>
+                        
+                        """)
+
+def success_page(request):
+    return HttpResponse("<h1>Hey this is a success page</h1>")
+
+### then go to urls.py, add this
+
+urlpatterns = [
+    path('', home, name='home'),
+
+    path('success-page',success_page, name='success_page'),
+
+    path('admin/', admin.site.urls),
+]
+
+### This is a more efficient way Go to views.py, add this eg.
+
+from django.shortcuts import render
+
+from django.http import HttpResponse
+
+def home(request):
+    return render(request, "index.html")
+
+
+### and create a "templates" folder and add index.html like this
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Django Tutorial 2025</title>
+</head>
+<body>
+    <h1> This template is run by Django Server</h1>
+</body>
+</html>
+
+## To make model migrations
+## In models.py enter this
+
+from django.db import models
+
+# Create your models here.
+
+class Student(models.Model):
+    # id = models.AutoField()
+    name = models.CharField(max_length=100)
+    age = models.IntegerField()
+    email = models.EmailField()
+    address = models.TextField(null=True, blank=True)
+
+class Products(models.Model):
+    pass
+
+### Then in terminal enter following commands
+
+python .\manage.py makemigrations
+python .\manage.py migrate
+
+## To go to Django Shell
+
+python .\manage.py shell
+from home.models import *
+student = Student(name="Jatin", age=15, email="sareen@gmail.com", address="Ghaziabad")
+student
+student.save()
+
+student = Student.objects.create(name="Jatin Sareen", age=45, email="saree001n@gmail.com", address="America")
+student
+Student.objects.all()
+Student.objects.all()[0].name
+Student.objects.all()[0].address
+Student.objects.all()[0].email
+Student.objects.all()[1].email
+
+### This is utils.py
+
+from home.utils import * 
+run_this_function()
