@@ -136,3 +136,183 @@ Student.objects.all()[1].email
 
 from home.utils import * 
 run_this_function()
+
+## One more method to create Data
+
+car_dict={"car_name": "Alto", "speed":80}
+car_dict
+Car.objects.create(**car_dict)
+for car in cars:
+    print(f"{car.id}The car name is {car.car_name} with high speed of {car.speed}")
+
+car=Car.objects.get(id=1)
+car
+car=Car.objects.filter(id=10)
+car
+car=Car.objects.filter(id=1)
+car
+
+## To Update the Car object
+
+car=Car.objects.get(id=1)
+car.car_name="Creata"
+car.speed=90
+car.save()
+car
+
+Car.objects.filter(id=1).update(car_name="Creta Dark Edition") 
+
+## To delete a record from the car object
+
+Car.objects.get(id=1).delete()
+Car.objects.all()
+Car.objects.all().delete()
+
+## Now Let's Start with create a Recipie Project
+
+### Go to CMD, type
+cd core
+python .\manage.py startapp APP_NAME                         # Eg. APP_NAME--> vege
+
+### Then go to settings.py in core and update EXTERNAL_APPS in vege
+
+EXTERNAL_APPS = [
+    'accounts',
+    'home',
+    'vege'
+]
+
+### Then make migrations using CMD
+
+python manage.py makemigrations
+python manage.py migrate
+
+### Start the Django Server
+
+python manage.py runserver
+
+### Now go to views.py in vege to return different templates like this
+
+from django.shortcuts import render
+from .models import *
+
+def receipes(request):
+    if request.method == "POST":
+        data = request.POST
+        receipe_image = request.FILES.get('receipe_image')
+        receipe_name=data.get('receipe_name')
+        receipe_description=data.get('receipe_description')
+
+        Receipe.objects.create(receipe_name=receipe_name,
+                               receipe_description=receipe_description,
+                               receipe_image=receipe_image)
+
+    return render(request, 'receipes.html')
+
+
+### Now create a "templates" folder and in it the "receipes.html"
+
+### Now add the url of receipes in urls.py like this
+
+from vege.views import *
+
+urlpatterns = [
+    path('', home, name='home'),
+
+    path('receipes/', receipes, name='receipes'),
+
+    path('contact/', contact, name='contact'),
+    path('about/', about, name='about'),
+
+    path('success-page',success_page, name='success_page'),
+
+    path('admin/', admin.site.urls),
+]
+
+### Now in receipes.html file connect the data send in frontend to the backend using method="post"
+
+### Now create a admin panel by configuring the admin.py file
+
+from django.contrib import admin
+
+from .models import Receipe
+
+admin.site.register(Receipe)
+
+## To check the records based on the conditions
+
+python manage.py shell
+from vege.models import *
+vege = Receipe.objects.all()
+vege
+
+for veg in vege:
+     veg.receipe_view_count = random.randint(10,100)
+     veg.save()
+
+vege = Receipe.objects.all().order_by("receipe_view_count")        # Ascending Order
+
+vege = Receipe.objects.all().order_by("-receipe_view_count")       # Descending Order
+
+Receipe.objects.filter(receipe_view_count__gte = 55)[0].receipe_view_count   # gte--> Greater than or equal to
+
+Receipe.objects.filter(receipe_view_count__lte = 55)[0].receipe_view_count   # lte--> less than or equal to
+
+## To create a new admin password, Go to the command shell
+
+python manage.py createsuperuser
+
+## seed.py is used to create fake datasets
+
+## Some Django queries
+
+queryset = Student.objects.filter(student_name__startswith = "abh")     # Student name starts with "abh"
+
+queryset = Student.objects.filter(student_email__endswith = ".org")     # Student mail id ends with ".org"
+
+queryset = Student.objects.filter(student_name__icontains = "AN")       # Student name contains "AN"
+
+queryset = Student.objects.filter(student_address__icontains = "Rober")   # Student address contains "Rober"
+
+queryset[0].student_id       # Gives student_id
+queryset[0].id               # Gives Uniques or primary key id
+queryset[0].pk               # Gives Uniques or primary key id
+queryset[0].department       # Gives department
+
+queryset = Student.objects.filter(department__department="Civil")        # '__' is used for accessing the primary key in Django
+
+queryset = Student.objects.filter(department__department__icontains="Civil")  # First '__' for the primary key and second '__' for the django itself student_name__icontains
+
+d=['Civil', 'Electrical']
+queryset = Student.objects.filter(department__department__in=d)
+
+queryset = Student.objects.exclude(department__department="Civil")   # For the except "Civil" department
+
+queryset = Student.objects.filter(student_name="Alok")
+len(queryset)
+queryset.exists()    # Gives True or False
+
+queryset = Student.objects.filter(student_address__icontains = "Rober")
+queryset.values()[0]['student_age']        # Right Way
+queryset.values()[0].student_age           # Wrong Way
+
+queryset = Student.objects.all()
+queryset.reverse()
+
+queryset = Student.objects.values_list('id', 'student_name')
+queryset        # Returns the 'id' and 'student_name' only
+
+Student.objects.aggregate(Avg('student_age'))
+Student.objects.aggregate(Max('student_age'))
+Student.objects.aggregate(Min('student_age'))
+Student.objects.aggregate(Sum('student_age'))
+
+student = Student.objects.values('student_age').annotate(Count('student_age'))
+
+student = Student.objects.values('department').annotate(Count('department'))
+
+student = Student.objects.annotate(Count('department'), Count('student_age'))
+
+student = Student.objects.values('department', 'student_age').annotate(Count('department'), Count('student_age'))
+
+student = Student.objects.values('department', 'student_age').annotate(Count('department'), Count('student_age')).values_list()
