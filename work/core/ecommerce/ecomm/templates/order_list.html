@@ -1,0 +1,9 @@
+<h2>Order List</h2>
+<a href="{% url 'add_order' %}">Add Order</a>
+<ul>
+    {% for order in orders %}
+        <li>
+            {{ order.customer.name }} ordered {{ order.quantity }} x {{ order.product.name }} on {{ order.order_date }}
+        </li>
+    {% endfor %}
+</ul>
